@@ -1,0 +1,60 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: yellow;
+}
+
+.eyes {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: block;
+  background-color: white;
+  margin: 0 20px;
+  border-radius: 50%;
+  box-shadow: 0 5px 45px rgba(0, 0, 0, 0.2), inset 0 0 15px #f5af19,
+    inset 0 0 25px #f5af19;
+}
+
+.eyes::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 35px;
+  width: 50px;
+  height: 50px;
+  transform: translate(-50%, -50%);
+  background: #000;
+  border-radius: 50%;
+  border: 10px solid skyblue;
+  box-sizing: border-box;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  gap: 20px;
+}
+
+.modal-body input {
+  width: 70%;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 20px;
+}
+
+.products {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.card-img {
+  object-fit: contain;
+}
