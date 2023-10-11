@@ -56,16 +56,16 @@ function setProductsToStorage(products) {
   localStorage.setItem("products", JSON.stringify(products));
 }
 
-const saveBtn = document.querySelector("#save-btn");
+const saveBtn = document.querySelector("#save-changes");
+const addBtn = document.querySelector("#add-btn");
 const closeBtn = document.querySelector("#close");
-saveBtn.addEventListener("click", createProduct);
+addBtn.addEventListener("click", createProduct);
 
 //create
+const imgInp = document.querySelector("#url-inp");
+const titleInp = document.querySelector("#title-inp");
+const priceInp = document.querySelector("#price-inp");
 function createProduct() {
-  const imgInp = document.querySelector("#url-inp");
-  const titleInp = document.querySelector("#title-inp");
-  const priceInp = document.querySelector("#price-inp");
-
   const productObj = {
     url: imgInp.value,
     title: titleInp.value,
@@ -97,11 +97,14 @@ function render(data = getProductsFromStorage()) {
           <b>Price</b>: ${item.price} $
           </p>
           <button id='del-btn' class="btn btn-danger">Delete</button>
-        </div>
-      </div>
-    `;
+          <button id='upd-btn' class='btn btn-success' data-bs-toggle="modal"
+          data-bs-target="#exampleModal">Update</button>
+          </div>
+          </div>
+          `;
   });
   addDeleteEvent();
+  addUpdateEvent();
 }
 
 render();
@@ -122,3 +125,53 @@ function deleteProduct(e) {
 
   render();
 }
+
+//update
+
+function getOneProductById(id) {
+  return getProductsFromStorage()[+id];
+}
+
+function addUpdateEvent() {
+  let updateBtns = document.querySelectorAll("#upd-btn");
+  updateBtns.forEach((btn) => btn.addEventListener("click", updateProduct));
+}
+
+function updateProduct(e) {
+  // if(e.target)
+  let productId = e.target.parentNode.parentNode.id;
+  let productObj = getOneProductById(productId);
+  console.log(productObj);
+  imgInp.value = productObj.url;
+  priceInp.value = productObj.price;
+  titleInp.value = productObj.title;
+
+  saveBtn.setAttribute("id", productId);
+}
+
+saveBtn.addEventListener("click", saveChanges);
+
+function saveChanges() {
+  if (!saveBtn.id) return;
+  let products = getProductsFromStorage();
+  let productObj = products[+saveBtn.id];
+  productObj.url = imgInp.value;
+  productObj.title = titleInp.value;
+  productObj.price = priceInp.value;
+  setProductsToStorage(products);
+  saveBtn.removeAttribute("id");
+  closeBtn.click();
+  render();
+}
+
+// search
+const searchInp = document.querySelector("#search-inp");
+searchInp.addEventListener("input", (e) => {
+  let products = getProductsFromStorage();
+  products = products.filter((item) => {
+    return (
+      item.title.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1
+    );
+  });
+  render(products);
+});

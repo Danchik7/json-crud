@@ -18,21 +18,30 @@
     <script defer src="./main.js"></script>
   </head>
   <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Locale Storage</a>
+        <form class="d-flex">
+          <input
+            id="search-inp"
+            class="form-control me-2"
+            type="search"
+            placeholder="Search"
+            aria-label="Search"
+          />
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+        <button
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
+          class="btn btn-outline-warning"
+          type="submit"
+        >
+          Add product
+        </button>
+      </div>
+    </nav>
     <div class="container">
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#">Locale Storage</a>
-
-          <button
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-            class="btn btn-outline-warning"
-            type="submit"
-          >
-            Add product
-          </button>
-        </div>
-      </nav>
       <div class="products"></div>
 
       <!-- !Modal -->
@@ -50,6 +59,7 @@
                 Fill the inputs
               </h5>
               <button
+                id="close"
                 type="button"
                 class="btn-close"
                 data-bs-dismiss="modal"
@@ -57,7 +67,7 @@
               ></button>
             </div>
             <div class="modal-body">
-              <!-- custom inputs -->
+              <!-- create inputs -->
               <input type="url" placeholder="Enter image url" id="url-inp" />
               <input
                 type="text"
@@ -67,16 +77,11 @@
               <input type="number" placeholder="Enter price" id="price-inp" />
             </div>
             <div class="modal-footer">
-              <button
-                id="close"
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-              <button type="button" id="save-btn" class="btn btn-primary">
+              <button class="btn btn-success" id="save-changes">
                 Save changes
+              </button>
+              <button type="button" id="add-btn" class="btn btn-primary">
+                Add product
               </button>
             </div>
           </div>
