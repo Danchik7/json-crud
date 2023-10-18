@@ -1,177 +1,133 @@
-let body = document.querySelector("body");
-body.addEventListener("mousemove", eyeball);
+const API = "http://localhost:8000/products";
 
-function eyeball() {
-  const eye = document.querySelectorAll(".eyes");
-  eye.forEach((item) => {
-    let x = item.getBoundingClientRect().left + item.clientWidth / 2;
-    let y = item.getBoundingClientRect().top + item.clientHeight / 2;
-    let radian = Math.atan2(event.pageX - x, event.pageY - y);
-    let rotate = radian * (180 / Math.PI) * -1 + 270;
-    item.style.transform = `rotate(${rotate}deg)`;
-  });
-}
+//add product
+let productTitle = document.querySelector("#title");
+let productPrice = document.querySelector("#price");
+let productDesc = document.querySelector("#desc");
+let productImage = document.querySelector("#image");
+let addBtn = document.querySelector("#add-btn");
+let addForm = document.querySelector("#add-form");
 
-////////////////////////////////////////////////////////////
-
-// localStorage
-// localStorage.setItem("name", "Nurik");
-// localStorage.setItem("age", 22);
-// // console.log(localStorage.getItem("name"));
-// // localStorage.removeItem("name");
-// localStorage.clear();
-// console.log(localStorage.key("name"));
-
-// let products = [
-//   {
-//     title: "Fridge",
-//     price: 2000,
-//   },
-//   {
-//     title: "MicroWave",
-//     price: 1500,
-//   },
-// ];
-
-// localStorage.setItem("products", JSON.stringify(products));
-
-// let newProducts = JSON.parse(localStorage.getItem("products"));
-// console.log(newProducts);
-
-function initStorage() {
-  console.log("init");
-  if (!localStorage.getItem("products")) {
-    console.log(localStorage.getItem("products"));
-    localStorage.setItem("products", "[]");
+async function addProduct(e) {
+  e.preventDefault();
+  if (
+    !productTitle.value.trim() ||
+    !productPrice.value.trim() ||
+    !productDesc.value.trim() ||
+    !productImage.value.trim()
+  ) {
+    alert("Some inputs are empty");
+    return;
   }
-}
 
-initStorage();
-
-function getProductsFromStorage() {
-  return JSON.parse(localStorage.getItem("products"));
-}
-
-function setProductsToStorage(products) {
-  localStorage.setItem("products", JSON.stringify(products));
-}
-
-const saveBtn = document.querySelector("#save-changes");
-const addBtn = document.querySelector("#add-btn");
-const closeBtn = document.querySelector("#close");
-addBtn.addEventListener("click", createProduct);
-
-//create
-const imgInp = document.querySelector("#url-inp");
-const titleInp = document.querySelector("#title-inp");
-const priceInp = document.querySelector("#price-inp");
-function createProduct() {
-  const productObj = {
-    url: imgInp.value,
-    title: titleInp.value,
-    price: priceInp.value,
+  let productObj = {
+    title: productTitle.value,
+    price: productPrice.value,
+    desc: productDesc.value,
+    image: productImage.value,
   };
 
-  let products = getProductsFromStorage();
-  products.push(productObj);
-  setProductsToStorage(products);
+  await fetch(API, {
+    method: "POST",
+    body: JSON.stringify(productObj),
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+    },
+  });
 
-  imgInp.value = "";
-  titleInp.value = "";
-  priceInp.value = "";
+  productTitle.value = "";
+  productPrice.value = "";
+  productDesc.value = "";
+  productImage.value = "";
 
-  closeBtn.click();
   render();
 }
 
-function render(data = getProductsFromStorage()) {
-  let container = document.querySelector(".products");
-  container.innerHTML = "";
-  data.forEach((item, index) => {
-    container.innerHTML += `
-    <div class="card" style="width: 18rem" id="${index}">
-        <img class='card-img' src="${item.url}" height=500 class="card-img-top" alt="..." />
-        <div class="card-body">
-          <h5 class="card-title">${item.title}</h5>
-          <p class="card-text">
-          <b>Price</b>: ${item.price} $
-          </p>
-          <button id='del-btn' class="btn btn-danger">Delete</button>
-          <button id='upd-btn' class='btn btn-success' data-bs-toggle="modal"
-          data-bs-target="#exampleModal">Update</button>
-          </div>
-          </div>
-          `;
+addForm.addEventListener("submit", addProduct);
+
+//! read
+
+const products = document.querySelector("#products");
+
+async function render() {
+  let response = await fetch(API);
+  let data = await response.json();
+  products.innerHTML = "";
+  data.forEach((card) => {
+    products.innerHTML += `
+    <div class="card border-dark" style="width: 18rem;">
+  <img height=180 class='fit-contain' src="${card.image}"  class="card-img-top" alt="${card.title}">
+  <div class="card-body">
+    <h5 class="card-title">${card.title}</h5>
+    <h5>Price: ${card.price} $</h5>
+    <p class="card-text">${card.desc}</p>
+    <button id=${card.id} class='btn btn-danger btn-delete'>Detele</button>
+    <button data-bs-toggle="modal"
+      data-bs-target="#exampleModal" id=${card.id} class='btn btn-primary btn-update'>Update</button>
+  </div>
+</div>
+    `;
   });
-  addDeleteEvent();
-  addUpdateEvent();
 }
 
 render();
 
-function addDeleteEvent() {
-  let deleteBtns = document.querySelectorAll("#del-btn");
-  console.log(deleteBtns);
-  deleteBtns.forEach((btn) => btn.addEventListener("click", deleteProduct));
-}
-
 //delete
-function deleteProduct(e) {
-  let productId = e.target.parentNode.parentNode.id;
-  console.log(productId);
-  let products = getProductsFromStorage();
-  products.splice(productId, 1);
-  setProductsToStorage(products);
+document.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("btn-delete")) {
+    console.log(e.target);
+    const productId = e.target.id;
 
-  render();
-}
+    await fetch(`${API}/${productId}`, {
+      method: "DELETE",
+    });
 
-//update
+    render();
+  }
+});
 
-function getOneProductById(id) {
-  return getProductsFromStorage()[+id];
-}
+// update
+let editForm = document.querySelector("#edit-form");
+let editTitle = document.querySelector("#edit-title");
+let editPrice = document.querySelector("#edit-price");
+let editDesc = document.querySelector("#edit-desc");
+let editImage = document.querySelector("#edit-image");
 
-function addUpdateEvent() {
-  let updateBtns = document.querySelectorAll("#upd-btn");
-  updateBtns.forEach((btn) => btn.addEventListener("click", updateProduct));
-}
+let closeBtn = document.querySelector(".btn-close");
 
-function updateProduct(e) {
-  // if(e.target)
-  let productId = e.target.parentNode.parentNode.id;
-  let productObj = getOneProductById(productId);
-  console.log(productObj);
-  imgInp.value = productObj.url;
-  priceInp.value = productObj.price;
-  titleInp.value = productObj.title;
+document.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("btn-update")) {
+    let productId = e.target.id;
+    let response = await fetch(`${API}/${productId}`);
+    let productObj = await response.json();
 
-  saveBtn.setAttribute("id", productId);
-}
+    editTitle.value = productObj.title;
+    editPrice.value = productObj.price;
+    editDesc.value = productObj.desc;
+    editImage.value = productObj.image;
 
-saveBtn.addEventListener("click", saveChanges);
+    editForm.id = "edit-form " + productObj.id;
+  }
+});
 
-function saveChanges() {
-  if (!saveBtn.id) return;
-  let products = getProductsFromStorage();
-  let productObj = products[+saveBtn.id];
-  productObj.url = imgInp.value;
-  productObj.title = titleInp.value;
-  productObj.price = priceInp.value;
-  setProductsToStorage(products);
-  saveBtn.removeAttribute("id");
+editForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  let updatedObj = {
+    title: editTitle.value,
+    price: editPrice.value,
+    desc: editDesc.value,
+    image: editImage.value,
+  };
+
+  let id = e.target.id.split(" ")[1];
+
+  await fetch(`${API}/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(updatedObj),
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+    },
+  });
   closeBtn.click();
   render();
-}
-
-// search
-const searchInp = document.querySelector("#search-inp");
-searchInp.addEventListener("input", (e) => {
-  let products = getProductsFromStorage();
-  products = products.filter((item) => {
-    return (
-      item.title.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1
-    );
-  });
-  render(products);
 });

@@ -1,0 +1,18 @@
+{
+  "products": [
+    {
+      "title": "Rolls Royce",
+      "price": "700000",
+      "desc": "Свежепригнанный с грузии",
+      "image": "https://hips.hearstapps.com/hmg-prod/images/2024-rolls-royce-phantom-102-64bad70ba7661.jpg?crop=0.498xw:0.446xh;0.300xw,0.332xh&resize=1200:*",
+      "id": 2
+    },
+    {
+      "title": "BMW",
+      "price": "8000",
+      "desc": "Бандитская бэха",
+      "image": "https://www.vladtime.ru/uploads/posts/2018-12/1545286329_1.jpeg",
+      "id": 3
+    }
+  ]
+}
